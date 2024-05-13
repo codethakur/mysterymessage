@@ -24,6 +24,7 @@ export default function Home() {
               height={24}
               priority
             />
+            
           </a>
         </div>
       </div>
@@ -37,6 +38,9 @@ export default function Home() {
           height={37}
           priority
         />
+      </div>
+      <div>
+        <p className="font-bold text-3xl">Mystery Message</p>
       </div>
 
       <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
