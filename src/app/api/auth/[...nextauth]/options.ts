@@ -5,7 +5,7 @@ import dbConnect from '@/lib/dbConnect';
 import UserModel from '@/model/User';
 
 
-export const authOptions:NextAuthConfig={
+const authOptions:NextAuthConfig={
     providers: [
         CredentialsProvider({
           id: 'credentials',
@@ -64,13 +64,13 @@ export const authOptions:NextAuthConfig={
           return session;
         },
       },
+      pages: {
+        signIn: '/sign-in',
+      },
       session: {
         strategy: 'jwt',
       },
       secret: process.env.NEXTAUTH_SECRET,
-      pages: {
-        signIn: '/sign-in',
-      },
     };
 
-// export default NextAuth(authOptions);
+export default NextAuth(authOptions);
