@@ -9,7 +9,7 @@ export const config = {
 };
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request, secret: JWT_SECRET }); // Pass the JWT secret here
+  const token = await getToken({ req: request, secret: JWT_SECRET }); 
   const url = request.nextUrl;
 
   if (
