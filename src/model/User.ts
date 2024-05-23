@@ -1,8 +1,19 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface Message extends Document {
   content: string;
   createdAt: Date;
+}
+
+export interface User extends Document {
+  username: string;
+  email: string;
+  password: string;
+  veryfyCode: string;
+  verfyCodeExpiry: Date;
+  isVerified: boolean;
+  isAcceptingMessage: boolean;
+  messages: Message[];
 }
 
 const MessageSchema: Schema<Message> = new Schema({
@@ -16,17 +27,6 @@ const MessageSchema: Schema<Message> = new Schema({
     default: Date.now,
   },
 });
-
-export interface User extends Document {
-  username: string;
-  email: string;
-  password: string;
-  veryfyCode: string;
-  verfyCodeExpiry: Date;
-  isVerified: boolean;
-  isAcceptingMessage: boolean;
-  messages: Message[];
-}
 
 const UserSchema: Schema<User> = new Schema({
   username: {
@@ -64,8 +64,6 @@ const UserSchema: Schema<User> = new Schema({
   messages: [MessageSchema],
 });
 
-const UserModel =
-  (mongoose.models.User as mongoose.Model<User>) ||
-  mongoose.model("User", UserSchema);
-
-export default UserModel;
+export const UserModel: Model<User> =
+  (mongoose.models.User as Model<User>) ||
+  mongoose.model<User>("User", UserSchema);

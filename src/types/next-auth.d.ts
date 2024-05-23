@@ -26,3 +26,12 @@ declare module 'next-auth/jwt' {
     username?: string;
   }
 }
+
+interface CustomSession extends Session {
+  user: {
+    _id?: string;
+    isVerified?: boolean;
+    isAcceptingMessages?: boolean;
+    username?: string;
+  } & DefaultSession['user'];
+}
