@@ -4,9 +4,9 @@ import {zodResolver} from "@hookform/resolvers/zod"
 import { useForm} from "react-hook-form"
 import * as z from "zod"
 import Link from 'next/link'
-import { useDebounceValue } from 'usehooks-ts'
+import { useDebounceValue, useDebounceCallback } from 'usehooks-ts'
 import { useToast } from '@/components/ui/use-toast'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { signUpSchema } from '@/schemas/signUpSchema'
 import axios, {AxiosError} from 'axios'
 import { ApiResponse } from '@/types/ApiResponse'
@@ -20,9 +20,9 @@ const page = () => {
     const [usernameMessage, setUernameMessage] = useState('');
     const [isCheckingUsername, setIsCheckingUsername] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const debounceUsername = useDebounceValue(username, 500)
+    const debounce = useDebounceCallback(setUsername, 500)
     const { toast } = useToast()
-    const router = useRouter(); 
+    const router = useRouter()
 
     //zod implementation
     const form = useForm<z.infer<typeof signUpSchema>>({
@@ -35,11 +35,11 @@ const page = () => {
     })
     useEffect(()=>{
       const checkUsernameUnique = async ()=>{
-        if(debounceUsername){
+        if(username){
           setIsCheckingUsername(true)
           setUernameMessage('')
           try{
-            const response = await axios.get(`/api/check-username-unique?username=$`)
+            const response = await axios.get(`/api/check-username-unique?username`)
             setUernameMessage(response.data.message)
           }catch(error)
           {
@@ -52,7 +52,7 @@ const page = () => {
         }
       }
       checkUsernameUnique()
-    },[debounceUsername])
+    },[username])
 
   const onSubmit = async (data: z.infer<typeof signUpSchema>)=>{
       setIsSubmitting(true)
@@ -98,7 +98,7 @@ const page = () => {
                 {...field} 
                 onChange={(e)=>{
                   field.onChange(e)
-                  setUsername(e.target.value)
+                  debounce(e.target.value)
                 }}
                 />
               </FormControl>
@@ -132,6 +132,7 @@ const page = () => {
                 {...field}
                 />
               </FormControl>
+              {isCheckingUsername && <Loader2 className='animate-spin'/>}
               <FormMessage />
             </FormItem>
           )}
