@@ -31,6 +31,8 @@ const page = () => {
   const { toast } = useToast();
   const router = useRouter();
 
+  const MIN_USERNAME_LENGTH = 3; 
+
   // zod implementation
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
@@ -43,7 +45,7 @@ const page = () => {
 
   useEffect(() => {
     const checkUsernameUnique = async () => {
-      if (username) {
+      if (username.length >= MIN_USERNAME_LENGTH) { 
         setIsCheckingUsername(true);
         setUsernameMessage("");
         try {
@@ -60,6 +62,8 @@ const page = () => {
         } finally {
           setIsCheckingUsername(false);
         }
+      } else {
+        setUsernameMessage("");
       }
     };
     checkUsernameUnique();
@@ -91,7 +95,7 @@ const page = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-200">
-      <div className="w-full max-w-md p-8 space-y-8  bg-gray-300 rounded-lg shadow-lg shadow-gray-500">
+      <div className="w-full max-w-md p-8 space-y-8 bg-gray-300 rounded-lg shadow-lg shadow-gray-500">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
             Join Mystery Message
@@ -124,9 +128,8 @@ const page = () => {
                         : "text-red-500"
                     }`}
                   >
-                    test {usernameMessage}
+                    {usernameMessage}
                   </p>
-
                   <FormMessage />
                 </FormItem>
               )}
