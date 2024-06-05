@@ -1,10 +1,10 @@
-import NextAuth, { NextAuthOptions } from "next-auth";
+import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
-import {UserModel} from '@/model/User';
+import UserModel from '@/model/User';
 
-const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       id: 'credentials',
@@ -22,25 +22,23 @@ const authOptions: NextAuthOptions = {
               { username: credentials.identifier },
             ],
           });
-          
           if (!user) {
-            throw new Error('Invalid login credentials');
+            throw new Error('No user found with this email');
           }
-
           if (!user.isVerified) {
-            throw new Error('Account not verified');
+            throw new Error('Please verify your account before logging in');
           }
-
-          const isPasswordCorrect = await bcrypt.compare(credentials.password, user.password);
-          
-          if (!isPasswordCorrect) {
-            throw new Error('Invalid login credentials');
+          const isPasswordCorrect = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
+          if (isPasswordCorrect) {
+            return user;
+          } else {
+            throw new Error('Incorrect password');
           }
-
-          return user;
-        } catch (error) {
-          console.error('Error during authorization', error);
-          throw new Error('Authorization error');
+        } catch (err: any) {
+          throw new Error(err);
         }
       },
     }),
@@ -48,7 +46,7 @@ const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token._id = user._id?.toString();
+        token._id = user._id?.toString(); 
         token.isVerified = user.isVerified;
         token.isAcceptingMessages = user.isAcceptingMessages;
         token.username = user.username;
@@ -57,21 +55,19 @@ const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token) {
-          session.user._id = token._id,
-          session.user.isVerified= token.isVerified,
-          session.user.isAcceptingMessages= token.isAcceptingMessages,
-          session.user.username= token.username,
+        session.user._id = token._id;
+        session.user.isVerified = token.isVerified;
+        session.user.isAcceptingMessages = token.isAcceptingMessages;
+        session.user.username = token.username;
       }
       return session;
     },
-  },
-  pages: {
-    signIn: '/sign-in',
   },
   session: {
     strategy: 'jwt',
   },
   secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: '/sign-in',
+  },
 };
-
-export default NextAuth(authOptions);
