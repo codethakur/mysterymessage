@@ -15,7 +15,6 @@ export async function POST(req: Request) {
       model: openai('gpt-3.5-turbo-instruct'),
       maxTokens: 900,
       prompt,
-      //stream: true  // Combined as a part of the single argument object
     });
 
     return result.toAIStreamResponse();
